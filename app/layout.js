@@ -1,6 +1,19 @@
+import "./globals.css";
 import { AuthContextProvider } from "./utils/auth-context";
 
-export default function AuthLayout({ children })
-{
-    return <AuthContextProvider>{children}</AuthContextProvider>;
+export const metadata = {
+  title: "NewLeaf",
+  description: "Animal Community Platform",
+};
+
+export default function RootLayout({ children }) {
+  return (
+    <html lang="en">
+      <body>
+        <AuthContextProvider>
+          {children}
+        </AuthContextProvider>
+      </body>
+    </html>
+  );
 }
