@@ -3,11 +3,42 @@
 :root {
   --background: #ffffff;
   --foreground: #171717;
+  
+  /* NewLeaf Green Palette */
+  --green-dark: #084B41;
+  --green-medium: #8A9F77;
+  --green-light: #A8B89A;
+  --green-lighter: #C4D4B8;
+  
+  /* NewLeaf Pink Palette */
+  --pink-pale: #FDEBEA;
+  --pink-light: #F5D5D2;
+  --pink-medium: #E7B5AC;
+  --pink-dark: #D99A8F;
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
+  
+  /* Green Colors */
+  --color-green-dark: var(--green-dark);
+  --color-green-medium: var(--green-medium);
+  --color-green-light: var(--green-light);
+  --color-green-lighter: var(--green-lighter);
+  
+  /* Pink Colors */
+  --color-pink-pale: var(--pink-pale);
+  --color-pink-light: var(--pink-light);
+  --color-pink-medium: var(--pink-medium);
+  --color-pink-dark: var(--pink-dark);
+  
+  /* Semantic Colors */
+  --color-success: var(--green-dark);
+  --color-error: var(--pink-dark);
+  --color-warning: var(--pink-medium);
+  --color-info: var(--green-medium);
+  
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
 }
