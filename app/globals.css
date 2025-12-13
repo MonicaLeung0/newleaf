@@ -1,20 +1,27 @@
 @import "tailwindcss";
 
+/* 
+ * Color definitions from styles/colors.js
+ * These CSS variables match the color palette defined in the styles folder
+ */
 :root {
   --background: #ffffff;
   --foreground: #171717;
   
-  /* NewLeaf Green Palette */
-  --green-dark: #084B41;
-  --green-medium: #8A9F77;
-  --green-light: #A8B89A;
-  --green-lighter: #C4D4B8;
+  /* NewLeaf Green Palette - from styles/colors.js */
+  --green-dark: #084B41;      /* colors.green.dark */
+  --green-medium: #8A9F77;    /* colors.green.medium */
+  --green-light: #A8B89A;     /* colors.green.light */
+  --green-lighter: #C4D4B8;   /* colors.green.lighter */
+  --green-pale: #eef7ed;     /* colors.green.pale */
   
-  /* NewLeaf Pink Palette */
-  --pink-pale: #FDEBEA;
-  --pink-light: #F5D5D2;
-  --pink-medium: #E7B5AC;
-  --pink-dark: #D99A8F;
+  /* NewLeaf Pink Palette - from styles/colors.js */
+  --pink-pale: #FDEBEA;       /* colors.pink.pale */
+  --pink-white: #fcf5f5;       /* colors.pink.white */
+  --pink-light: #F5D5D2;      /* colors.pink.light */
+  --pink-medium: #E7B5AC;     /* colors.pink.medium */
+  --pink-dark: #D99A8F;       /* colors.pink.dark */
+  --pink-red: #ba5949;        /* colors.pink.red */
 }
 
 @theme inline {
@@ -26,13 +33,15 @@
   --color-green-medium: var(--green-medium);
   --color-green-light: var(--green-light);
   --color-green-lighter: var(--green-lighter);
+  --color-green-pale: var(--green-pale);
   
   /* Pink Colors */
   --color-pink-pale: var(--pink-pale);
   --color-pink-light: var(--pink-light);
   --color-pink-medium: var(--pink-medium);
   --color-pink-dark: var(--pink-dark);
-  
+  --color-pink-red: var(--pink-red);
+  --color-pink-white: var(--pink-white);
   /* Semantic Colors */
   --color-success: var(--green-dark);
   --color-error: var(--pink-dark);

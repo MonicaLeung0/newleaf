@@ -23,29 +23,32 @@ export default function Home() {
     <div className="p-10">
       {user ? (
         <div>
-          <h1 className="text-3xl font-bold mb-6">Welcome to the App</h1>
-          <p className="mb-3">Logged in as: {user.email || user.displayName}</p>
+          <h1 className="text-3xl font-bold mb-6 text-green-dark">Welcome to the App</h1>
+          <p className="mb-3 text-gray-700">Logged in as: {user.email || user.displayName}</p>
           <button
             onClick={handleLogout}
-            className="bg-red-500 text-white px-4 py-2 rounded-lg hover:opacity-90"
+            className="bg-pink-medium text-white px-4 py-2 rounded-lg hover:bg-pink-dark transition-colors"
           >
             Logout
           </button>
         </div>
       ) : (
+        <>  
         <div className="flex flex-col items-center justify-center min-h-[60vh]">
-          <h1 className="text-4xl font-bold mb-4 text-center">Welcome to NewLeaf</h1>
-          <p className="text-xl mb-8 text-center text-gray-600">Come and join us</p>
+          <h1 className="text-4xl font-bold mb-4 text-center text-green-dark">Welcome to NewLeaf</h1>
+          <p className="text-xl mb-8 text-center text-white-medium">Come and join us</p>
           <button
             onClick={() => {
               setModalMode("login");
               setIsModalOpen(true);
             }}
-            className="bg-white text-[#1a1a1a] font-medium py-3 px-8 rounded-lg hover:bg-gray-100 transition-colors border border-gray-300"
+            className="bg-green-dark text-white font-medium py-3 px-8 rounded-lg hover:bg-green-medium transition-colors shadow-md"
           >
             Log in
           </button>
         </div>
+        </>
+        
       )}
 
       {/* Auth Modals */}

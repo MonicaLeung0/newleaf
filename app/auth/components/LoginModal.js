@@ -17,7 +17,11 @@ export default function LoginModal({ isOpen, onClose, onSwitchToSignup }) {
       await emailSignIn(email, password);
       onClose();
     } catch (err) {
-      setError(err.message);
+      if (err.code === "auth/invalid-credential" || err.message.includes("invalid-credential")) {
+        setError("Account not exist");
+      } else {
+        setError(err.message);
+      }
     }
   };
 
@@ -47,16 +51,16 @@ export default function LoginModal({ isOpen, onClose, onSwitchToSignup }) {
     <div className="fixed inset-0 z-50 flex items-center justify-center">
       {/* Backdrop */}
       <div 
-        className="absolute inset-0 bg-black/60 backdrop-blur-sm"
+        className="absolute inset-0 bg-green-pale/40 backdrop-blur-sm"
         onClick={onClose}
       ></div>
       
       {/* Modal Content */}
-      <div className="relative bg-[#1a1a1a] rounded-2xl p-8 w-full max-w-md mx-4 shadow-2xl border border-gray-800">
+      <div className="relative bg-pink-pale rounded-2xl p-8 w-full max-w-md mx-4 shadow-2xl border-2 border-green-medium">
         {/* Close Button */}
         <button
           onClick={onClose}
-          className="absolute top-4 right-4 text-white hover:text-gray-300 transition-colors"
+          className="absolute top-4 right-4 text-green-dark hover:text-green-medium transition-colors"
           aria-label="Close"
         >
           <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -65,17 +69,17 @@ export default function LoginModal({ isOpen, onClose, onSwitchToSignup }) {
         </button>
 
         {/* Title */}
-        <h2 className="text-3xl font-semibold text-white text-center mb-2">
+        <h2 className="text-3xl font-semibold text-green-dark text-center mb-2">
           Log in
         </h2>
         
         {/* Description */}
-        <p className="text-white/80 text-sm text-center mb-6">
+        <p className="text-green-medium text-sm text-center mb-6">
           Welcome to the NewLeaf!
         </p>
 
         {error && (
-          <p className="text-red-400 text-sm text-center mb-4">{error}</p>
+          <p className="text-pink-red text-sm text-center mb-4 font-medium">{error}</p>
         )}
 
         {/* Social Login Buttons */}
@@ -83,7 +87,7 @@ export default function LoginModal({ isOpen, onClose, onSwitchToSignup }) {
           {/* Google Button */}
           <button
             onClick={handleGoogle}
-            className="w-full bg-[#2a2a2a] hover:bg-[#333333] text-white py-3 px-4 rounded-lg flex items-center justify-center gap-3 transition-colors border border-gray-700"
+            className="w-full bg-white hover:bg-green-lighter text-green-dark py-3 px-4 rounded-lg flex items-center justify-center gap-3 transition-colors border-2 border-green-medium shadow-sm"
           >
             <svg className="w-5 h-5" viewBox="0 0 24 24">
               <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
@@ -97,7 +101,7 @@ export default function LoginModal({ isOpen, onClose, onSwitchToSignup }) {
           {/* GitHub Button */}
           <button
             onClick={handleGitHub}
-            className="w-full bg-[#2a2a2a] hover:bg-[#333333] text-white py-3 px-4 rounded-lg flex items-center justify-center gap-3 transition-colors border border-gray-700"
+            className="w-full bg-white hover:bg-green-lighter text-green-dark py-3 px-4 rounded-lg flex items-center justify-center gap-3 transition-colors border-2 border-green-medium shadow-sm"
           >
             <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
               <path fillRule="evenodd" d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.531 1.032 1.531 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482C19.138 20.197 22 16.425 22 12.017 22 6.484 17.522 2 12 2z" clipRule="evenodd"/>
@@ -109,10 +113,10 @@ export default function LoginModal({ isOpen, onClose, onSwitchToSignup }) {
         {/* Divider */}
         <div className="relative mb-6">
           <div className="absolute inset-0 flex items-center">
-            <div className="w-full border-t border-gray-700"></div>
+            <div className="w-full border-t border-green-medium/30"></div>
           </div>
           <div className="relative flex justify-center text-sm">
-            <span className="px-4 bg-[#1a1a1a] text-white/70">OR</span>
+            <span className="px-4 bg-pink-pale text-green-medium">OR</span>
           </div>
         </div>
 
@@ -125,7 +129,7 @@ export default function LoginModal({ isOpen, onClose, onSwitchToSignup }) {
               onChange={(e) => setEmail(e.target.value)}
               placeholder="Email address"
               required
-              className="w-full bg-[#2a2a2a] border border-gray-700 text-white placeholder-gray-400 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-white/20 focus:border-transparent"
+              className="w-full bg-white border-2 border-green-medium text-green-dark placeholder-green-medium/60 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-green-medium focus:border-green-dark transition-colors"
             />
           </div>
           <div>
@@ -135,26 +139,26 @@ export default function LoginModal({ isOpen, onClose, onSwitchToSignup }) {
               onChange={(e) => setPassword(e.target.value)}
               placeholder="Password"
               required
-              className="w-full bg-[#2a2a2a] border border-gray-700 text-white placeholder-gray-400 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-white/20 focus:border-transparent"
+              className="w-full bg-white border-2 border-green-medium text-green-dark placeholder-green-medium/60 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-green-medium focus:border-green-dark transition-colors"
             />
           </div>
           <button
             type="submit"
-            className="w-full bg-white text-[#1a1a1a] font-medium py-3 px-4 rounded-lg hover:bg-gray-100 transition-colors"
+            className="w-full bg-green-dark text-white font-medium py-3 px-4 rounded-lg hover:bg-green-medium transition-colors shadow-md"
           >
             Continue
           </button>
         </form>
 
         {/* Sign Up Link */}
-        <p className="text-white/70 text-sm text-center mt-4">
+        <p className="text-green-medium text-sm text-center mt-4">
           Don't have an account yet?{" "}
           <button
             onClick={() => {
               setError("");
               onSwitchToSignup();
             }}
-            className="text-white hover:text-white/80 underline transition-colors"
+            className="text-green-dark hover:text-green-medium underline transition-colors font-medium"
           >
             Sign up
           </button>

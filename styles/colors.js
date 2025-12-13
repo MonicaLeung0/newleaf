@@ -10,14 +10,17 @@ export const colors = {
     medium: '#8A9F77',    // Lighter muted green
     light: '#A8B89A',     // Light green variant
     lighter: '#C4D4B8',   // Very light green
+    pale: '#eef7ed',
   },
   
   // Pink Palette
   pink: {
+    white: '#fcf5f5',
     pale: '#FDEBEA',      // Very pale pink
     light: '#F5D5D2',     // Light pink/peach (adjusted from visual)
     medium: '#E7B5AC',    // Muted rose/light coral
-    dark: '#D99A8F',      // Darker pink variant
+    dark: '#D99A8F', 
+    red: '#ba5949',      // Darker pink variant
   },
   
   // Neutral Colors
