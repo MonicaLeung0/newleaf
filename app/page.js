@@ -41,13 +41,8 @@ export default function Home() {
           </button>
         </div>
       ) : (
-        <div className="
-          flex flex-col items-center justify-center
-          bg-pink-white/80 backdrop-blur-sm
-          rounded-2xl py-20 w-full max-w-2xl mx-4
-          shadow-[0_25px_60px_-15px_rgba(0,0,0,0.65)]
-          border-2 border-green-medium
-        ">
+        <div className="flex flex-col items-center justify-center bg-pink-white/80 backdrop-blur-sm rounded-2xl py-20 w-full max-w-2xl mx-4 shadow-[0_25px_60px_-15px_rgba(0,0,0,0.65)] border-2 border-green-medium">
+
 
           <h1 className="text-4xl font-bold mb-4 text-center text-green-dark">Welcome to NewLeaf!</h1>
           <p className="text-xl mb-8 text-center text-pink-red">Come and join us</p>
