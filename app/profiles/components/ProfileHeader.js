@@ -19,7 +19,7 @@ export default function ProfileHeader() {
       {/* Cover Banner */}
       <div className="w-full h-32 sm:h-40 rounded-b-2xl shadow-sm overflow-hidden">
         <img
-          src={userProfile?.coverPhotoURL || "/cover-placeholder.png"}
+          src={userProfile?.coverPhotoURL || "/default-cover.jpg"}
           alt="Cover"
           className="w-full h-full object-cover"
         />

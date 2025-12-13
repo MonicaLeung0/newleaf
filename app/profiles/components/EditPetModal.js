@@ -13,6 +13,7 @@ export default function EditPetModal({ isOpen, onClose, pet, onSave }) {
   const [age, setAge] = useState("");
   const [image, setImage] = useState("");
   const [preview, setPreview] = useState("");
+  const [waitingForAdoption, setWaitingForAdoption] = useState(false);
 
   const [uploading, setUploading] = useState(false);
   const [saving, setSaving] = useState(false);
@@ -33,6 +34,7 @@ export default function EditPetModal({ isOpen, onClose, pet, onSave }) {
       setAge(pet.age || "");
       setImage(safeImage);
       setPreview(safeImage);
+      setWaitingForAdoption(pet.waitingForAdoption || false);
       setError("");
     }
   }, [isOpen, pet]);
@@ -70,6 +72,7 @@ export default function EditPetModal({ isOpen, onClose, pet, onSave }) {
         type: type.trim(),
         age: age.trim(),
         image,
+        waitingForAdoption: waitingForAdoption,
       });
 
       if (onSave) onSave();
@@ -154,6 +157,20 @@ export default function EditPetModal({ isOpen, onClose, pet, onSave }) {
             onChange={(e) => setAge(e.target.value)}
             required
           />
+
+          {/* Waiting for Adoption Toggle */}
+          <div className="flex items-center gap-3 p-4 bg-green-pale rounded-lg border-2 border-green-light">
+            <input
+              type="checkbox"
+              id="waitingForAdoption"
+              checked={waitingForAdoption}
+              onChange={(e) => setWaitingForAdoption(e.target.checked)}
+              className="w-5 h-5 text-green-dark border-green-medium rounded focus:ring-green-dark"
+            />
+            <label htmlFor="waitingForAdoption" className="text-green-dark font-medium cursor-pointer">
+              Make this animal available for adoption
+            </label>
+          </div>
 
           {error && <p className="text-pink-red text-center">{error}</p>}
 

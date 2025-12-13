@@ -43,6 +43,7 @@ export async function addPost(postData, userId) {
       content: postData.content || "",
       publisher: postData.publisher || userId,
       publisherId: userId, // Always use the userId parameter - ensures userId === publisherId
+      petId: postData.petId || null,
       createdAt: serverTimestamp(),
       updatedAt: serverTimestamp(),
       likes: [],

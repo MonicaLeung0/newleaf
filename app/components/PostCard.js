@@ -1,13 +1,17 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import Link from "next/link";
 import { useUserAuth } from "../utils/auth-context";
 import { likePost, isPostLiked } from "../_servies/postService";
+import { getPetById } from "../_servies/petService";
 
 export default function PostCard({ post, onEdit, onDelete, onLike }) {
   const { user } = useUserAuth();
   const [isLiked, setIsLiked] = useState(false);
   const [liking, setLiking] = useState(false);
+  const [pet, setPet] = useState(null);
+  const [loadingPet, setLoadingPet] = useState(false);
 
   // Check if post is liked when component mounts or user changes
   useEffect(() => {
@@ -31,6 +35,35 @@ export default function PostCard({ post, onEdit, onDelete, onLike }) {
       active = false; // prevents React state updates after unmount
     };
   }, [user?.uid, post?.id]);
+
+  // Load pet information if post has a petId
+  useEffect(() => {
+    let active = true;
+
+    async function loadPet() {
+      if (!post?.petId) {
+        setPet(null);
+        return;
+      }
+
+      try {
+        setLoadingPet(true);
+        const petData = await getPetById(post.petId, post.publisherId);
+        if (active) setPet(petData);
+      } catch (err) {
+        console.error("Error loading pet:", err);
+        if (active) setPet(null);
+      } finally {
+        if (active) setLoadingPet(false);
+      }
+    }
+
+    loadPet();
+
+    return () => {
+      active = false;
+    };
+  }, [post?.petId, post?.publisherId]);
   
   if (!post) return null;
 
@@ -117,6 +150,30 @@ export default function PostCard({ post, onEdit, onDelete, onLike }) {
         </p>
       )}
 
+      {/* Pet Information */}
+      {pet && (
+        <Link 
+          href={`/pets/${pet.id}`}
+          className="block mb-4 p-4 bg-green-pale rounded-lg border-2 border-green-light hover:border-green-medium transition cursor-pointer"
+        >
+          <div className="flex items-center gap-4">
+            <div className="w-20 h-20 rounded-lg overflow-hidden border-2 border-green-light flex-shrink-0">
+              <img
+                src={pet.image || "/pet-placeholder.png"}
+                alt={pet.name}
+                className="w-full h-full object-cover"
+              />
+            </div>
+            <div className="flex-1">
+              <div className="text-sm text-green-medium mb-1">Featured Animal</div>
+              <div className="text-lg font-semibold text-green-dark">{pet.name}</div>
+              <div className="text-sm text-green-medium">{pet.type} • {pet.age}</div>
+              <div className="text-xs text-green-light mt-1">Click to view profile →</div>
+            </div>
+          </div>
+        </Link>
+      )}
+
       {/* Images */}
       {post.imgarray && post.imgarray.length > 0 && (
         <div className={`grid gap-2 mb-4 ${
@@ -131,7 +188,7 @@ export default function PostCard({ post, onEdit, onDelete, onLike }) {
               key={index}
               src={imgUrl}
               alt={`Post image ${index + 1}`}
-              className="w-full h-48 object-cover rounded-lg border-2 border-green-light"
+              className="w-full h-auto object-contain max-h-[600px] rounded-lg border-2 border-green-light block"
             />
           ))}
         </div>

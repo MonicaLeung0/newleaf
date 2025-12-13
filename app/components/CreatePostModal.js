@@ -3,6 +3,7 @@
 import { useState, useEffect, useRef } from "react";
 import { uploadToCloudinary } from "../utils/cloudinary";
 import { addPost, updatePost } from "../_servies/postService";
+import { getPetsByUserId } from "../_servies/petService";
 import { useUserAuth } from "../utils/auth-context";
 
 export default function CreatePostModal({ isOpen, onClose, onSubmit, editPost = null }) {
@@ -15,9 +16,34 @@ export default function CreatePostModal({ isOpen, onClose, onSubmit, editPost = 
   const [uploadError, setUploadError] = useState("");
   const [saving, setSaving] = useState(false);
   const [saveError, setSaveError] = useState("");
+  const [pets, setPets] = useState([]);
+  const [selectedPetId, setSelectedPetId] = useState("");
+  const [loadingPets, setLoadingPets] = useState(false);
 
   const modalRef = useRef(null);
   const fileInputRef = useRef(null);
+
+  // Load user's pets when modal opens
+  useEffect(() => {
+    const loadPets = async () => {
+      if (!isOpen || !user) {
+        setPets([]);
+        return;
+      }
+
+      try {
+        setLoadingPets(true);
+        const userPets = await getPetsByUserId(user.uid);
+        setPets(userPets);
+      } catch (error) {
+        console.error("Error loading pets:", error);
+      } finally {
+        setLoadingPets(false);
+      }
+    };
+
+    loadPets();
+  }, [isOpen, user]);
 
   // Load post data when editing
   useEffect(() => {
@@ -26,11 +52,13 @@ export default function CreatePostModal({ isOpen, onClose, onSubmit, editPost = 
       setContent(editPost.content || "");
       setImages(editPost.imgarray || []);
       setPreviews(editPost.imgarray || []);
+      setSelectedPetId(editPost.petId || "");
     } else if (!isOpen) {
       setTitle("");
       setContent("");
       setImages([]);
       setPreviews([]);
+      setSelectedPetId("");
       setUploadError("");
       setSaveError("");
       if (fileInputRef.current) {
@@ -142,6 +170,7 @@ export default function CreatePostModal({ isOpen, onClose, onSubmit, editPost = 
         content: content.trim(),
         imgarray: images,
         publisher: user.displayName || user.email || "Anonymous",
+        ...(selectedPetId && { petId: selectedPetId }),
       };
 
       if (editPost) {
@@ -153,6 +182,7 @@ export default function CreatePostModal({ isOpen, onClose, onSubmit, editPost = 
           id: editPost.id,
           ...postData,
           publisherId: user.uid,
+          petId: selectedPetId || editPost.petId || null,
           likes: editPost.likes || [],
           likesCount: editPost.likesCount || 0,
         });
@@ -214,6 +244,27 @@ export default function CreatePostModal({ isOpen, onClose, onSubmit, editPost = 
             onChange={(e) => setContent(e.target.value)}
             required
           />
+
+          {/* Pet Selection */}
+          {pets.length > 0 && (
+            <div className="space-y-2">
+              <label className="block text-sm font-medium text-green-dark">
+                Featured Animal (optional)
+              </label>
+              <select
+                className="w-full border-2 border-green-medium px-3 py-2 rounded-lg bg-white text-green-medium"
+                value={selectedPetId}
+                onChange={(e) => setSelectedPetId(e.target.value)}
+              >
+                <option value="">None</option>
+                {pets.map((pet) => (
+                  <option key={pet.id} value={pet.id}>
+                    {pet.name} ({pet.type})
+                  </option>
+                ))}
+              </select>
+            </div>
+          )}
 
           {/* Image Upload */}
           <div className="space-y-2">

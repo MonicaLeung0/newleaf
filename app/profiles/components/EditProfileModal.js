@@ -123,7 +123,7 @@ export default function EditProfileModal({ isOpen, onClose }) {
 
           <div className="w-full h-40 rounded-xl overflow-hidden border-2 border-green-light shadow-sm">
             <img
-              src={coverPreview || "/cover-placeholder.png"}
+              src={coverPreview || "/default-cover.jpg"}
               className="w-full h-full object-cover"
             />
           </div>
