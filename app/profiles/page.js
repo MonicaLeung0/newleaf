@@ -1,4 +1,4 @@
-//protected (requires login)
+// profiles/page.js
 "use client";
 
 import { useState, useEffect } from "react";
@@ -6,17 +6,23 @@ import ProtectedRoute from "../components/ProtectedRoute";
 import ProfileHeader from "./components/ProfileHeader";
 import PetCard from "./components/PetCard";
 import AddPetModal from "./components/AddPetModal";
-import { getPetsByUserId } from "../_servies/petService";
+import EditPetModal from "./components/EditPetModal";   // <-- ADD THIS
+import { getPetsByUserId, deletePet } from "../_servies/petService";
 import { useUserAuth } from "../utils/auth-context";
 
 export default function ProfilesPage() {
   const { user } = useUserAuth();
-  const [isModalOpen, setIsModalOpen] = useState(false);
+
   const [pets, setPets] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
-  // Load pets from Firebase when component mounts or user changes
+  const [isAddModalOpen, setIsAddModalOpen] = useState(false);
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+
+  const [selectedPet, setSelectedPet] = useState(null);
+
+  // Load pets
   useEffect(() => {
     const loadPets = async () => {
       if (!user) {
@@ -27,10 +33,11 @@ export default function ProfilesPage() {
       try {
         setLoading(true);
         setError("");
-        const userPets = await getPetsByUserId(user.uid);
-        setPets(userPets);
+
+        const result = await getPetsByUserId(user.uid);
+        setPets(result);
       } catch (err) {
-        console.error("Error loading pets:", err);
+        console.error(err);
         setError("Failed to load pets. Please try again.");
       } finally {
         setLoading(false);
@@ -40,17 +47,30 @@ export default function ProfilesPage() {
     loadPets();
   }, [user]);
 
-  const addPet = async (newPet) => {
-    // Refresh pets list after adding
-    if (user) {
-      try {
-        const userPets = await getPetsByUserId(user.uid);
-        setPets(userPets);
-      } catch (err) {
-        console.error("Error refreshing pets:", err);
-      }
+  // After Add Pet
+  const refreshPets = async () => {
+    if (!user) return;
+    const result = await getPetsByUserId(user.uid);
+    setPets(result);
+  };
+
+  // Handle Edit click
+  const handleEditPet = (pet) => {
+    setSelectedPet(pet);
+    setIsEditModalOpen(true);
+  };
+
+  // Handle Delete click
+  const handleDeletePet = async (pet) => {
+    if (!confirm(`Delete ${pet.name}?`)) return;
+
+    try {
+      await deletePet(pet.id, user.uid);
+      refreshPets();
+    } catch (error) {
+      console.error("Delete error:", error);
+      alert("Failed to delete pet.");
     }
-    setIsModalOpen(false); // close modal after adding
   };
 
   return (
@@ -60,14 +80,14 @@ export default function ProfilesPage() {
         {/* Header */}
         <ProfileHeader />
 
-        {/* Section header + Add button */}
+        {/* Section + Add Pet */}
         <div className="flex justify-between items-center mt-10 mb-4">
           <h2 className="text-2xl font-semibold text-green-dark">
             Your Animals
           </h2>
 
           <button
-            onClick={() => setIsModalOpen(true)}
+            onClick={() => setIsAddModalOpen(true)}
             className="
               bg-green-dark text-white px-4 py-2 rounded-lg
               hover:bg-green-medium transition shadow-md
@@ -77,31 +97,38 @@ export default function ProfilesPage() {
           </button>
         </div>
 
-        {/* Loading state */}
+        {/* Loading */}
         {loading && (
           <div className="text-center py-8">
             <p className="text-green-medium">Loading pets...</p>
           </div>
         )}
 
-        {/* Error state */}
+        {/* Error */}
         {error && (
           <div className="text-center py-8">
             <p className="text-pink-red">{error}</p>
           </div>
         )}
 
-        {/* Pet grid */}
+        {/* Pets Grid */}
         {!loading && !error && (
           <>
             {pets.length === 0 ? (
               <div className="text-center py-8">
-                <p className="text-green-medium text-lg">No pets yet. Add your first pet!</p>
+                <p className="text-green-medium text-lg">
+                  No pets yet. Add your first pet!
+                </p>
               </div>
             ) : (
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
                 {pets.map((pet) => (
-                  <PetCard key={pet.id} pet={pet} />
+                  <PetCard
+                    key={pet.id}
+                    pet={pet}
+                    onEdit={handleEditPet}
+                    onDelete={handleDeletePet}
+                  />
                 ))}
               </div>
             )}
@@ -109,12 +136,31 @@ export default function ProfilesPage() {
         )}
       </div>
 
-      {/* Modal */}
+      {/* Add Pet Modal */}
       <AddPetModal
-        isOpen={isModalOpen}
-        onClose={() => setIsModalOpen(false)}
-        onSubmit={addPet}
+        isOpen={isAddModalOpen}
+        onClose={() => setIsAddModalOpen(false)}
+        onSubmit={async () => {
+          await refreshPets();
+          setIsAddModalOpen(false);
+        }}
       />
+
+      {/* Edit Pet Modal */}
+      {selectedPet && (
+        <EditPetModal
+          isOpen={isEditModalOpen}
+          pet={selectedPet}
+          onClose={() => {
+            setSelectedPet(null);
+            setIsEditModalOpen(false);
+          }}
+          onSave={async () => {
+            await refreshPets();
+            setIsEditModalOpen(false);
+          }}
+        />
+      )}
     </ProtectedRoute>
   );
 }

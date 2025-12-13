@@ -104,7 +104,7 @@ export async function getPetsByUserId(userId) {
  */
 export async function updatePet(petId, userId, updates) {
   try {
-    if (updates.image && updates.image !== "/defalt-pet.jpg") {
+    if (updates.image && updates.image !== "/pet-placeholder.jpg") {
       await saveImageToFirebase(updates.image, userId);
     }
 
