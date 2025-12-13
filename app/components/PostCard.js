@@ -8,6 +8,29 @@ export default function PostCard({ post, onEdit, onDelete, onLike }) {
   const { user } = useUserAuth();
   const [isLiked, setIsLiked] = useState(false);
   const [liking, setLiking] = useState(false);
+
+  // Check if post is liked when component mounts or user changes
+  useEffect(() => {
+    let active = true;
+
+    async function loadLikedStatus() {
+      if (!user?.uid) return;
+      if (!post?.id) return;
+
+      try {
+        const liked = await isPostLiked(post.id, user.uid);
+        if (active) setIsLiked(liked);
+      } catch (err) {
+        console.error("Error checking liked status:", err);
+      }
+    }
+
+    loadLikedStatus();
+
+    return () => {
+      active = false; // prevents React state updates after unmount
+    };
+  }, [user?.uid, post?.id]);
   
   if (!post) return null;
 
@@ -16,16 +39,6 @@ export default function PostCard({ post, onEdit, onDelete, onLike }) {
   // Only non-owners can like
   const canLike = user && !isOwner;
 
-  // Check if post is liked when component mounts or user changes
-  useEffect(() => {
-    const checkLiked = async () => {
-      if (user && post.id) {
-        const liked = await isPostLiked(post.id, user.uid);
-        setIsLiked(liked);
-      }
-    };
-    checkLiked();
-  }, [user, post.id]);
 
   // Format timestamp
   const formatTimestamp = (timestamp) => {
