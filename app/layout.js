@@ -1,5 +1,6 @@
 import "./globals.css";
 import { AuthContextProvider } from "./utils/auth-context";
+import Navbar from "./components/Navbar";
 
 export const metadata = {
   title: "NewLeaf",
@@ -11,7 +12,8 @@ export default function RootLayout({ children }) {
     <html lang="en">
       <body>
         <AuthContextProvider>
-          {children}
+          <Navbar />
+          <main>{children}</main>
         </AuthContextProvider>
       </body>
     </html>
