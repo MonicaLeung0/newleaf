@@ -1,17 +1,70 @@
 This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
 
+## Installation
+
+### Install Dependencies
+
+First, install all required packages:
+
+```bash
+npm install
+```
+
+### Install Firebase
+
+Firebase is already included in the dependencies. If you need to install it separately:
+
+```bash
+npm install firebase
+```
+
+### Install Cloudinary
+
+Cloudinary is already included via `next-cloudinary`. If you need to install it separately:
+
+```bash
+npm install next-cloudinary
+```
+
+## Setup
+
+### Firebase Configuration
+
+1. Create a Firebase project at [Firebase Console](https://console.firebase.google.com/)
+2. Enable Authentication (Email/Password, Google, GitHub)
+3. Create a Firestore database
+4. Create a Storage bucket
+5. Create a `.env.local` file in the root directory and add your Firebase configuration:
+
+```env
+NEXT_PUBLIC_FIREBASE_API_KEY=your_api_key
+NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN=your_auth_domain
+NEXT_PUBLIC_FIREBASE_PROJECT_ID=your_project_id
+NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET=your_storage_bucket
+NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID=your_messaging_sender_id
+NEXT_PUBLIC_FIREBASE_APP_ID=your_app_id
+```
+
+### Cloudinary Configuration
+
+1. Create a Cloudinary account at [Cloudinary](https://cloudinary.com/)
+2. Get your Cloud Name and Upload Preset from the Cloudinary Dashboard
+3. Add the following to your `.env.local` file:
+
+```env
+NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME=your_cloud_name
+NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET=your_upload_preset
+```
+
+**Note:** Make sure your Upload Preset is set to "unsigned" or has appropriate permissions configured in your Cloudinary dashboard.
+
 ## Getting Started
 
 First, run the development server:
 
 ```bash
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+
 ```
 
 Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.

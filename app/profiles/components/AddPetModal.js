@@ -1,15 +1,24 @@
 "use client";
 
 import { useState, useEffect, useRef } from "react";
+import { uploadToCloudinary } from "../../utils/cloudinary";
+import { addPet } from "../../_servies/petService";
+import { useUserAuth } from "../../utils/auth-context";
 
 export default function AddPetModal({ isOpen, onClose, onSubmit }) {
+  const { user } = useUserAuth();
   const [name, setName] = useState("");
   const [type, setType] = useState("Dog");
   const [age, setAge] = useState("");
   const [image, setImage] = useState("");
   const [preview, setPreview] = useState("");
+  const [uploading, setUploading] = useState(false);
+  const [uploadError, setUploadError] = useState("");
+  const [saving, setSaving] = useState(false);
+  const [saveError, setSaveError] = useState("");
 
   const modalRef = useRef(null);
+  const fileInputRef = useRef(null);
 
   // Reset form each time modal opens or closes
   useEffect(() => {
@@ -19,6 +28,11 @@ export default function AddPetModal({ isOpen, onClose, onSubmit }) {
       setAge("");
       setImage("");
       setPreview("");
+      setUploadError("");
+      setSaveError("");
+      if (fileInputRef.current) {
+        fileInputRef.current.value = "";
+      }
     }
   }, [isOpen]);
 
@@ -29,23 +43,84 @@ export default function AddPetModal({ isOpen, onClose, onSubmit }) {
     return () => window.removeEventListener("keydown", handleEsc);
   }, [onClose]);
 
-  // Live preview
-  const handleImageChange = (value) => {
-    setImage(value);
-    setPreview(value);
+  // Handle file selection and upload to Cloudinary
+  const handleFileChange = async (e) => {
+    const selectedFile = e.target.files[0];
+    if (!selectedFile) return;
+
+    // Validate file type
+    if (!selectedFile.type.startsWith("image/")) {
+      setUploadError("Please select an image file");
+      return;
+    }
+
+    // Validate file size (max 10MB)
+    if (selectedFile.size > 10 * 1024 * 1024) {
+      setUploadError("File size must be less than 10MB");
+      return;
+    }
+
+    // Create preview
+    const reader = new FileReader();
+    reader.onloadend = () => {
+      setPreview(reader.result);
+    };
+    reader.readAsDataURL(selectedFile);
+
+    // Upload to Cloudinary
+    setUploading(true);
+    setUploadError("");
+
+    try {
+      const imageUrl = await uploadToCloudinary(selectedFile);
+      setImage(imageUrl);
+    } catch (error) {
+      console.error("Upload error:", error);
+      setUploadError(error.message || "Failed to upload image");
+      setPreview("");
+      if (fileInputRef.current) {
+        fileInputRef.current.value = "";
+      }
+    } finally {
+      setUploading(false);
+    }
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
 
-    onSubmit({
-      name: name.trim(),
-      type,
-      age: age.trim(),
-      image: image.trim() || "/pet-placeholder.png",
-    });
+    if (!user) {
+      setSaveError("You must be logged in to add a pet");
+      return;
+    }
 
-    onClose();
+    setSaving(true);
+    setSaveError("");
+
+    try {
+      const petData = {
+        name: name.trim(),
+        type,
+        age: age.trim(),
+        image: image.trim() || "/pet-placeholder.png",
+      };
+
+      // Add pet to Firebase using petService
+      const petId = await addPet(petData, user.uid);
+
+      // Call the onSubmit callback with the pet data and ID
+      onSubmit({
+        id: petId,
+        ...petData,
+      });
+
+      onClose();
+    } catch (error) {
+      console.error("Error adding pet:", error);
+      setSaveError(error.message || "Failed to add pet");
+    } finally {
+      setSaving(false);
+    }
   };
 
   if (!isOpen) return null;
@@ -78,14 +153,14 @@ export default function AddPetModal({ isOpen, onClose, onSubmit }) {
           <input
             type="text"
             placeholder="Pet Name"
-            className="w-full border-2 border-green-medium px-3 py-2 rounded-lg"
+            className="w-full border-2 border-green-medium px-3 py-2 rounded-lg bg-white placeholder:text-green-light text-green-medium"
             value={name}
             onChange={(e) => setName(e.target.value)}
             required
           />
 
           <select
-            className="w-full border-2 border-green-medium px-3 py-2 rounded-lg bg-white"
+            className="w-full border-2 border-green-medium px-3 py-2 rounded-lg bg-white placeholder:text-green-medium text-green-medium"
             value={type}
             onChange={(e) => setType(e.target.value)}
           >
@@ -99,7 +174,7 @@ export default function AddPetModal({ isOpen, onClose, onSubmit }) {
           <input
             type="number"
             placeholder="Age (years)"
-            className="w-full border-2 border-green-medium px-3 py-2 rounded-lg"
+            className="w-full border-2 border-green-medium px-3 py-2 rounded-lg placeholder:text-green-light bg-white text-green-medium"
             value={age}
             onChange={(e) => setAge(e.target.value)}
             min="0"
@@ -107,19 +182,40 @@ export default function AddPetModal({ isOpen, onClose, onSubmit }) {
             required
           />
 
-          <input
-            type="text"
-            placeholder="Image URL (optional)"
-            className="w-full border-2 border-green-medium px-3 py-2 rounded-lg"
-            value={image}
-            onChange={(e) => handleImageChange(e.target.value)}
-          />
+          {/* Image Upload */}
+          <div className="space-y-2">
+            <label className="block text-sm font-medium text-green-dark">
+              Pet Image
+            </label>
+            <input
+              ref={fileInputRef}
+              type="file"
+              accept="image/*"
+              onChange={handleFileChange}
+              disabled={uploading}
+              className="w-full text-sm text-pink-red file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-green-dark file:text-white hover:file:bg-green-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+            />
+            {uploading && (
+              <p className="text-sm text-green-medium">Uploading image...</p>
+            )}
+            {uploadError && (
+              <p className="text-sm text-pink-red">{uploadError}</p>
+            )}
+            {image && !uploading && (
+              <p className="text-sm text-green-dark">✓ Image uploaded successfully</p>
+            )}
+          </div>
+
+          {saveError && (
+            <p className="text-sm text-pink-red text-center">{saveError}</p>
+          )}
 
           <button
             type="submit"
-            className="w-full bg-green-dark text-white py-3 rounded-lg hover:bg-green-medium transition"
+            disabled={saving || uploading}
+            className="w-full bg-green-dark text-white py-3 rounded-lg hover:bg-green-medium transition disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            Add Pet
+            {saving ? "Adding Pet..." : "Add Pet"}
           </button>
         </form>
       </div>
