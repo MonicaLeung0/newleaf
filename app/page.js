@@ -32,14 +32,14 @@ export default function Home() {
       }}
     >
       {user ? (
-        <div className="p-10 w-full max-w-4xl">
+        <div className="p-10 w-full max-w-4xl bg-pink-white">
           <h1 className="text-3xl font-bold mb-6 text-green-dark">Welcome to the App</h1>
           <p className="mb-6 text-gray-700">Logged in as: {user.email || user.displayName}</p>
           
           {/* Image Upload Component */}
-          <div className="mb-6">
+          {/* <div className="mb-6">
             <ImageUpload />
-          </div>
+          </div> */}
           
           <button
             onClick={handleLogout}
