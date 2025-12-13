@@ -5,6 +5,7 @@ import { useUserAuth } from "./utils/auth-context";
 import { useState } from "react";
 import LoginModal from "./auth/components/LoginModal";
 import SignupModal from "./auth/components/SignupModal";
+import { ImageUpload } from "./components/imgUpload";
 
 export default function Home() {
   const { user, firebaseSignOut } = useUserAuth();
@@ -20,11 +21,26 @@ export default function Home() {
   };
 
   return (
-    <div className="p-10">
+    <div
+      className="min-h-screen flex items-center justify-center"
+      style={{
+        backgroundImage:
+          "linear-gradient(rgba(255,255,255,0.65), rgba(255,255,255,0.45)), url(/DogAndCat.jpg)",
+        backgroundSize: "cover",
+        backgroundPosition: "center",
+        backgroundRepeat: "no-repeat",
+      }}
+    >
       {user ? (
-        <div>
+        <div className="p-10 w-full max-w-4xl bg-pink-white">
           <h1 className="text-3xl font-bold mb-6 text-green-dark">Welcome to the App</h1>
-          <p className="mb-3 text-gray-700">Logged in as: {user.email || user.displayName}</p>
+          <p className="mb-6 text-gray-700">Logged in as: {user.email || user.displayName}</p>
+          
+          {/* Image Upload Component */}
+          {/* <div className="mb-6">
+            <ImageUpload />
+          </div> */}
+          
           <button
             onClick={handleLogout}
             className="bg-pink-medium text-white px-4 py-2 rounded-lg hover:bg-pink-dark transition-colors"
@@ -33,10 +49,16 @@ export default function Home() {
           </button>
         </div>
       ) : (
-        <>  
-        <div className="flex flex-col items-center justify-center min-h-[60vh]">
-          <h1 className="text-4xl font-bold mb-4 text-center text-green-dark">Welcome to NewLeaf</h1>
-          <p className="text-xl mb-8 text-center text-white-medium">Come and join us</p>
+        <div className="
+          flex flex-col items-center justify-center
+          bg-pink-white/80 backdrop-blur-sm
+          rounded-2xl py-20 w-full max-w-2xl mx-4
+          shadow-[0_25px_60px_-15px_rgba(0,0,0,0.65)]
+          border-2 border-green-medium
+        ">
+
+          <h1 className="text-4xl font-bold mb-4 text-center text-green-dark">Welcome to NewLeaf!</h1>
+          <p className="text-xl mb-8 text-center text-pink-red">Come and join us</p>
           <button
             onClick={() => {
               setModalMode("login");
@@ -47,8 +69,6 @@ export default function Home() {
             Log in
           </button>
         </div>
-        </>
-        
       )}
 
       {/* Auth Modals */}
