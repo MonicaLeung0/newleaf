@@ -9,6 +9,7 @@ import {
   updateDoc, 
   deleteDoc, 
   query, 
+  where,
   orderBy,
   serverTimestamp,
   arrayUnion,
@@ -172,6 +173,27 @@ export async function deletePost(postId) {
 }
 
 /**
+ * Check if a post is liked by a user
+ * @param {string} postId - Post document ID
+ * @param {string} userId - User ID
+ * @returns {Promise<boolean>}
+ */
+export async function isPostLiked(postId, userId) {
+  try {
+    if (!userId) return false;
+    
+    const likedRef = collection(db, "users", userId, "liked");
+    const q = query(likedRef, where("postId", "==", postId));
+    const querySnapshot = await getDocs(q);
+    
+    return !querySnapshot.empty;
+  } catch (error) {
+    console.error("Error checking if post is liked:", error);
+    return false;
+  }
+}
+
+/**
  * Like a post
  * @param {string} postId - Post document ID
  * @param {string} userId - User ID who is liking the post
@@ -182,23 +204,42 @@ export async function likePost(postId, userId) {
     const postRef = doc(db, "posts", postId);
     const postDoc = await getDoc(postRef);
     
-    if (postDoc.exists()) {
-      const postData = postDoc.data();
-      const likes = postData.likes || [];
+    if (!postDoc.exists()) {
+      throw new Error("Post not found");
+    }
+
+    const postData = postDoc.data();
+    
+    // Check if already liked by checking user's liked collection
+    const isLiked = await isPostLiked(postId, userId);
+    
+    if (isLiked) {
+      // Unlike: remove from user's liked collection and post's likes array
+      const likedRef = collection(db, "users", userId, "liked");
+      const q = query(likedRef, where("postId", "==", postId));
+      const querySnapshot = await getDocs(q);
       
-      if (likes.includes(userId)) {
-        // Unlike: remove user from likes array
-        await updateDoc(postRef, {
-          likes: arrayRemove(userId),
-          likesCount: Math.max(0, (postData.likesCount || 0) - 1),
-        });
-      } else {
-        // Like: add user to likes array
-        await updateDoc(postRef, {
-          likes: arrayUnion(userId),
-          likesCount: (postData.likesCount || 0) + 1,
-        });
-      }
+      // Delete all liked documents for this post
+      const deletePromises = querySnapshot.docs.map((likedDoc) =>
+        deleteDoc(doc(db, "users", userId, "liked", likedDoc.id))
+      );
+      await Promise.all(deletePromises);
+
+      await updateDoc(postRef, {
+        likes: arrayRemove(userId),
+        likesCount: Math.max(0, (postData.likesCount || 0) - 1),
+      });
+    } else {
+      // Like: add to user's liked collection and post's likes array
+      await addDoc(collection(db, "users", userId, "liked"), {
+        postId: postId,
+        createdAt: serverTimestamp(),
+      });
+
+      await updateDoc(postRef, {
+        likes: arrayUnion(userId),
+        likesCount: (postData.likesCount || 0) + 1,
+      });
     }
   } catch (error) {
     console.error("Error liking post:", error);

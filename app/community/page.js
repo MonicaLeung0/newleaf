@@ -64,6 +64,11 @@ export default function CommunityPage() {
     }
   };
 
+  // Handle like (refresh posts to update like counts)
+  const handleLike = async () => {
+    await refreshPosts();
+  };
+
   // Handle modal close
   const handleCloseModal = () => {
     setIsModalOpen(false);
@@ -123,6 +128,7 @@ export default function CommunityPage() {
                     post={post}
                     onEdit={handleEdit}
                     onDelete={handleDelete}
+                    onLike={handleLike}
                   />
                 ))}
               </div>

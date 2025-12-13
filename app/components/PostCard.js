@@ -1,14 +1,31 @@
 "use client";
 
+import { useState, useEffect } from "react";
 import { useUserAuth } from "../utils/auth-context";
+import { likePost, isPostLiked } from "../_servies/postService";
 
-export default function PostCard({ post, onEdit, onDelete }) {
+export default function PostCard({ post, onEdit, onDelete, onLike }) {
   const { user } = useUserAuth();
+  const [isLiked, setIsLiked] = useState(false);
+  const [liking, setLiking] = useState(false);
   
   if (!post) return null;
 
   // Check if current user is the post owner
   const isOwner = user && post.publisherId === user.uid;
+  // Only non-owners can like
+  const canLike = user && !isOwner;
+
+  // Check if post is liked when component mounts or user changes
+  useEffect(() => {
+    const checkLiked = async () => {
+      if (user && post.id) {
+        const liked = await isPostLiked(post.id, user.uid);
+        setIsLiked(liked);
+      }
+    };
+    checkLiked();
+  }, [user, post.id]);
 
   // Format timestamp
   const formatTimestamp = (timestamp) => {
@@ -108,7 +125,48 @@ export default function PostCard({ post, onEdit, onDelete }) {
       )}
 
       {/* Footer - Likes */}
-      <div className="flex items-center gap-2 text-sm text-gray-600">
+      <div className="flex items-center gap-3 text-sm">
+        {canLike && (
+          <button
+            onClick={async () => {
+              if (liking) return;
+              setLiking(true);
+              try {
+                await likePost(post.id, user.uid);
+                setIsLiked(!isLiked);
+                // Refresh posts to update like count
+                if (onLike) {
+                  await onLike();
+                }
+              } catch (error) {
+                console.error("Error toggling like:", error);
+              } finally {
+                setLiking(false);
+              }
+            }}
+            disabled={liking}
+            className={`flex items-center gap-2 px-3 py-2 rounded-lg transition ${
+              isLiked
+                ? "bg-pink-red text-white hover:bg-pink-dark"
+                : "bg-gray-200 text-gray-700 hover:bg-gray-300"
+            } disabled:opacity-50 disabled:cursor-not-allowed`}
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              className={`h-5 w-5 ${isLiked ? "fill-current" : ""}`}
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+              strokeWidth={2}
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"
+              />
+            </svg>
+            <span>{isLiked ? "Liked" : "Like"}</span>
+          </button>
+        )}
         <span className="text-green-dark font-medium">
           {post.likesCount || 0} {post.likesCount === 1 ? "like" : "likes"}
         </span>
