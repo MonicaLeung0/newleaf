@@ -64,3 +64,12 @@ body {
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
 }
+
+/* Landing page background (no hydration issues) */
+.bg-landing {
+  background-image: linear-gradient(rgba(255,255,255,0.65), rgba(255,255,255,0.45)), url('/DogAndCat.jpg');
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+}
+

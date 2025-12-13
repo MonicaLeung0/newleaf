@@ -21,16 +21,8 @@ export default function Home() {
   };
 
   return (
-    <div
-      className="min-h-screen flex items-center justify-center"
-      style={{
-        backgroundImage:
-          "linear-gradient(rgba(255,255,255,0.65), rgba(255,255,255,0.45)), url(/DogAndCat.jpg)",
-        backgroundSize: "cover",
-        backgroundPosition: "center",
-        backgroundRepeat: "no-repeat",
-      }}
-    >
+      <div className="min-h-screen flex items-center justify-center bg-landing">
+
       {user ? (
         <div className="p-10 w-full max-w-4xl bg-pink-white">
           <h1 className="text-3xl font-bold mb-6 text-green-dark">Welcome to the App</h1>

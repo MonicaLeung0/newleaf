@@ -1,6 +1,6 @@
 import "./globals.css";
-import { AuthContextProvider } from "./utils/auth-context";
 import Navbar from "./components/Navbar";
+import { AuthContextProvider } from "./utils/auth-context";
 
 export const metadata = {
   title: "NewLeaf",
