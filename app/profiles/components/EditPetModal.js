@@ -23,11 +23,16 @@ export default function EditPetModal({ isOpen, onClose, pet, onSave }) {
   // Load existing pet values
   useEffect(() => {
     if (isOpen && pet) {
+      const safeImage =
+        pet.image && pet.image.trim() !== ""
+          ? pet.image
+          : "/pet-placeholder.png";
+
       setName(pet.name || "");
       setType(pet.type || "");
       setAge(pet.age || "");
-      setImage(pet.image || "/pet-placeholder.png");
-      setPreview(pet.image || "/pet-placeholder.png");
+      setImage(safeImage);
+      setPreview(safeImage);
       setError("");
     }
   }, [isOpen, pet]);
@@ -81,9 +86,11 @@ export default function EditPetModal({ isOpen, onClose, pet, onSave }) {
 
   return (
     <div className="fixed inset-0 z-50 flex justify-center items-start bg-black/20 backdrop-blur-sm overflow-y-auto py-10">
-
       {/* Background overlay */}
-      <div className="absolute inset-0 pointer-events-auto" onClick={onClose}></div>
+      <div
+        className="absolute inset-0 pointer-events-auto"
+        onClick={onClose}
+      ></div>
 
       {/* Modal */}
       <div className="relative bg-pink-white p-8 rounded-2xl w-full max-w-lg shadow-xl border-2 border-green-medium max-h-[90vh] overflow-y-auto pointer-events-auto">
@@ -94,7 +101,7 @@ export default function EditPetModal({ isOpen, onClose, pet, onSave }) {
         {/* Image Preview */}
         <div className="flex flex-col items-center mb-6">
           <div className="w-40 h-40 rounded-xl overflow-hidden border-4 border-green-light shadow-md">
-            <img src={preview} className="w-full h-full object-cover" />
+            <img src={preview || "pet-placeholder.png"} alt="Pet Preview" className="w-full h-full object-cover" />
           </div>
 
           <button
@@ -113,12 +120,13 @@ export default function EditPetModal({ isOpen, onClose, pet, onSave }) {
             onChange={handleImageUpload}
           />
 
-          {uploading && <p className="text-green-medium text-sm mt-1">Uploading...</p>}
+          {uploading && (
+            <p className="text-green-medium text-sm mt-1">Uploading...</p>
+          )}
         </div>
 
         {/* Form */}
         <form onSubmit={handleSave} className="space-y-4">
-
           <input
             type="text"
             placeholder="Pet Name"
@@ -156,7 +164,6 @@ export default function EditPetModal({ isOpen, onClose, pet, onSave }) {
           >
             {saving ? "Saving..." : "Save Changes"}
           </button>
-
         </form>
       </div>
     </div>
