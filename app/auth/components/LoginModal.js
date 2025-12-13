@@ -152,7 +152,7 @@ export default function LoginModal({ isOpen, onClose, onSwitchToSignup }) {
 
         {/* Sign Up Link */}
         <p className="text-green-medium text-sm text-center mt-4">
-          Don't have an account yet?{" "}
+          Don&apos;t have an account yet?{" "}
           <button
             onClick={() => {
               setError("");
