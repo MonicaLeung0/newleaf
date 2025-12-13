@@ -1,9 +1,9 @@
-//protected (requires login)
 "use client";
 
 import { useState } from "react";
 import PostCard from "../components/PostCard";
 import CreatePostModal from "../components/CreatePostModal";
+import ProtectedRoute from "../components/ProtectedRoute";
 
 export default function CommunityPage() {
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -25,7 +25,7 @@ export default function CommunityPage() {
   const addPost = (content) => {
     const newPost = {
       id: posts.length + 1,
-      user: "You", // temporary — later replaced with user.displayName
+      user: "You",
       content,
       timestamp: "Just now",
     };
@@ -35,38 +35,40 @@ export default function CommunityPage() {
   };
 
   return (
-    <div style={{ padding: "2rem", maxWidth: "700px", margin: "0 auto" }}>
-      <h1 style={{ marginBottom: "1rem" }}>Community Feed</h1>
+    <ProtectedRoute>
+      <div style={{ padding: "2rem", maxWidth: "700px", margin: "0 auto" }}>
+        <h1 style={{ marginBottom: "1rem" }}>Community Feed</h1>
 
-      <button
-        onClick={() => setIsModalOpen(true)}
-        style={{
-          padding: "0.75rem 1rem",
-          background: "#4CAF50",
-          color: "white",
-          border: "none",
-          borderRadius: "6px",
-          cursor: "pointer",
-          marginBottom: "1.5rem",
-        }}
-      >
-        Create Post
-      </button>
+        <button
+          onClick={() => setIsModalOpen(true)}
+          style={{
+            padding: "0.75rem 1rem",
+            background: "#4CAF50",
+            color: "white",
+            border: "none",
+            borderRadius: "6px",
+            cursor: "pointer",
+            marginBottom: "1.5rem",
+          }}
+        >
+          Create Post
+        </button>
 
-      <CreatePostModal
-        isOpen={isModalOpen}
-        onClose={() => setIsModalOpen(false)}
-        onSubmit={addPost}
-      />
-
-      {posts.map((post) => (
-        <PostCard
-          key={post.id}
-          user={post.user}
-          content={post.content}
-          timestamp={post.timestamp}
+        <CreatePostModal
+          isOpen={isModalOpen}
+          onClose={() => setIsModalOpen(false)}
+          onSubmit={addPost}
         />
-      ))}
-    </div>
+
+        {posts.map((post) => (
+          <PostCard
+            key={post.id}
+            user={post.user}
+            content={post.content}
+            timestamp={post.timestamp}
+          />
+        ))}
+      </div>
+    </ProtectedRoute>
   );
 }
