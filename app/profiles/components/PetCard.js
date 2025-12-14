@@ -1,28 +1,39 @@
 "use client";
 
+import Link from "next/link";
 import { useUserAuth } from "@/app/utils/auth-context";
 
 export default function PetCard({ pet, onEdit, onDelete }) {
   const { user } = useUserAuth();
 
-  const handleDeleteClick = () => {
+  const handleDeleteClick = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
     if (confirm(`Are you sure you want to delete ${pet.name}?`)) {
       onDelete(pet);
     }
   };
 
+  const handleEditClick = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    onEdit(pet);
+  };
+
   return (
-    <div
+    <Link
+      href={`/pets/${pet.id}`}
       className="
         bg-pink-white border border-green-light rounded-xl
         shadow-md p-4 hover:shadow-lg transition 
         flex flex-col justify-between
+        block
       "
     >
       {/* Pet Image */}
       <div className="w-full h-40 rounded-lg overflow-hidden mb-4 shadow-sm">
         <img
-          src={pet.image}
+          src={pet.image || "/pet-placeholder.png"}
           alt={pet.name}
           className="w-full h-full object-cover"
         />
@@ -36,10 +47,10 @@ export default function PetCard({ pet, onEdit, onDelete }) {
       </div>
 
       {/* Action Buttons */}
-      <div className="flex justify-between mt-auto pt-3 border-t border-green-light/40">
+      <div className="flex justify-between mt-auto pt-3 border-t border-green-light/40" onClick={(e) => e.stopPropagation()}>
         {/* Edit Button */}
         <button
-          onClick={() => onEdit(pet)}
+          onClick={handleEditClick}
           className="
             bg-green-dark text-white px-4 py-1 rounded-lg text-sm
             hover:bg-green-medium transition shadow-sm
@@ -59,6 +70,6 @@ export default function PetCard({ pet, onEdit, onDelete }) {
           Delete
         </button>
       </div>
-    </div>
+    </Link>
   );
 }
