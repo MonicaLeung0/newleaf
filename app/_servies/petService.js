@@ -56,7 +56,7 @@ export async function addPet(petData, userId) {
       age: petData.age,
       image: petData.image || "/pet-placeholder.png",
       ownerId: userId,
-      waitingForAdoption: false,
+      waitingForAdoption: petData.waitingForAdoption || false,
       createdAt: serverTimestamp(),
       updatedAt: serverTimestamp(),
     });

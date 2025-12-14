@@ -12,6 +12,7 @@ export default function AddPetModal({ isOpen, onClose, onSubmit }) {
   const [age, setAge] = useState("");
   const [image, setImage] = useState("");
   const [preview, setPreview] = useState("");
+  const [waitingForAdoption, setWaitingForAdoption] = useState(false);
   const [uploading, setUploading] = useState(false);
   const [uploadError, setUploadError] = useState("");
   const [saving, setSaving] = useState(false);
@@ -28,6 +29,7 @@ export default function AddPetModal({ isOpen, onClose, onSubmit }) {
       setAge("");
       setImage("");
       setPreview("");
+      setWaitingForAdoption(false);
       setUploadError("");
       setSaveError("");
       if (fileInputRef.current) {
@@ -103,6 +105,7 @@ export default function AddPetModal({ isOpen, onClose, onSubmit }) {
         type,
         age: age.trim(),
         image: image.trim() || "/pet-placeholder.png",
+        waitingForAdoption: waitingForAdoption,
       };
 
       // Add pet to Firebase using petService
@@ -204,6 +207,20 @@ export default function AddPetModal({ isOpen, onClose, onSubmit }) {
             {image && !uploading && (
               <p className="text-sm text-green-dark">✓ Image uploaded successfully</p>
             )}
+          </div>
+
+          {/* Waiting for Adoption Toggle */}
+          <div className="flex items-center gap-3 p-4 bg-green-pale rounded-lg border-2 border-green-light">
+            <input
+              type="checkbox"
+              id="waitingForAdoption"
+              checked={waitingForAdoption}
+              onChange={(e) => setWaitingForAdoption(e.target.checked)}
+              className="w-5 h-5 text-green-dark border-green-medium rounded focus:ring-green-dark"
+            />
+            <label htmlFor="waitingForAdoption" className="text-green-dark font-medium cursor-pointer">
+              Make this animal available for adoption
+            </label>
           </div>
 
           {saveError && (
